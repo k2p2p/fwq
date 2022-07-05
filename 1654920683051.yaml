@@ -1,0 +1,305 @@
+---
+port: 7890
+socks-port: 7891
+mixed-port: 7893
+mode: rule
+log-level: silent
+allow-lan: true
+external-controller: 0.0.0.0:9090
+secret: '123456'
+bind-address: "*"
+ipv6: false
+dns:
+  enable: true
+  ipv6: true
+  enhanced-mode: redir-host
+  listen: 0.0.0.0:7874
+  use-hosts: true
+  nameserver:
+  - 218.104.111.114
+  - 114.114.114.114
+  - 119.29.29.29
+  - 223.5.5.5
+  fallback:
+  - https://dns.cloudflare.com/dns-query
+  - https://public.dns.iij.jp/dns-query
+  - https://jp.tiar.app/dns-query
+  - https://jp.tiarap.org/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+    - 0.0.0.0/8
+    - 10.0.0.0/8
+    - 100.64.0.0/10
+    - 127.0.0.0/8
+    - 169.254.0.0/16
+    - 172.16.0.0/12
+    - 192.0.0.0/24
+    - 192.0.2.0/24
+    - 192.88.99.0/24
+    - 192.168.0.0/16
+    - 198.18.0.0/15
+    - 198.51.100.0/24
+    - 203.0.113.0/24
+    - 224.0.0.0/4
+    - 240.0.0.0/4
+    - 255.255.255.255/32
+    domain:
+    - "+.google.com"
+    - "+.facebook.com"
+    - "+.youtube.com"
+    - "+.githubusercontent.com"
+    - "+.googlevideo.com"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - msftconnecttest.com
+    - msftncsi.com
+  default-nameserver:
+  - 114.114.114.114
+  - 119.29.29.29
+  - 223.5.5.5
+  - 218.104.111.114
+proxy-groups:
+- name: fen_genxin
+  type: select
+  use:
+  - fen_genxin
+- name: fen_ss
+  type: select
+  use:
+  - fen_ss
+- name: "\U0001F52F 代理模式"
+  type: select
+  proxies:
+  - 绕过大陆丨黑名单(GFWlist)
+  - 绕过大陆丨白名单(Whitelist)
+- name: "\U0001F530 自动选择分享节点"
+  type: url-test
+  proxies:
+  - fen_genxin
+  - fen_ss
+  url: http://www.gstatic.com/generate_204
+  interval: '667'
+  tolerance: '300'
+- name: "\U0001F530 手动选择分享节点"
+  type: select
+  proxies:
+  - fen_ss
+  - fen_genxin
+- name: "\U0001F6D1 广告拦截"
+  type: select
+  proxies:
+  - DIRECT
+  - REJECT
+  - PROXY
+- name: 绕过大陆丨黑名单(GFWlist)
+  type: url-test
+  proxies:
+  - DIRECT
+  url: http://www.gstatic.com/generate_204
+  interval: '86400'
+- name: 绕过大陆丨白名单(Whitelist)
+  type: url-test
+  proxies:
+  - PROXY
+  url: http://www.gstatic.com/generate_204
+  interval: '86400'
+- name: PROXY
+  type: select
+  proxies:
+  - "\U0001F530 自动选择分享节点"
+  - "\U0001F530 手动选择分享节点"
+proxy-providers:
+  fen_ss:
+    type: http
+    path: "./proxy_provider/fen_ss.yaml"
+    url: https://fastly.jsdelivr.net/gh/k2p2p/fwq@main/fen_ss.yaml
+    interval:
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  fen_genxin:
+    type: http
+    path: "./proxy_provider/fen_genxin.yaml"
+    url: https://fastly.jsdelivr.net/gh/k2p2p/fwq@main/fen_genxin.yaml
+    interval: 3600
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+rules:
+- IP-CIDR,198.18.0.1/16,REJECT,no-resolve
+- DOMAIN-SUFFIX,awesome-hd.me,DIRECT
+- DOMAIN-SUFFIX,broadcasthe.net,DIRECT
+- DOMAIN-SUFFIX,chdbits.co,DIRECT
+- DOMAIN-SUFFIX,classix-unlimited.co.uk,DIRECT
+- DOMAIN-SUFFIX,empornium.me,DIRECT
+- DOMAIN-SUFFIX,gazellegames.net,DIRECT
+- DOMAIN-SUFFIX,hdchina.org,DIRECT
+- DOMAIN-SUFFIX,hdsky.me,DIRECT
+- DOMAIN-SUFFIX,icetorrent.org,DIRECT
+- DOMAIN-SUFFIX,jpopsuki.eu,DIRECT
+- DOMAIN-SUFFIX,keepfrds.com,DIRECT
+- DOMAIN-SUFFIX,madsrevolution.net,DIRECT
+- DOMAIN-SUFFIX,m-team.cc,DIRECT
+- DOMAIN-SUFFIX,nanyangpt.com,DIRECT
+- DOMAIN-SUFFIX,ncore.cc,DIRECT
+- DOMAIN-SUFFIX,open.cd,DIRECT
+- DOMAIN-SUFFIX,ourbits.club,DIRECT
+- DOMAIN-SUFFIX,passthepopcorn.me,DIRECT
+- DOMAIN-SUFFIX,privatehd.to,DIRECT
+- DOMAIN-SUFFIX,redacted.ch,DIRECT
+- DOMAIN-SUFFIX,springsunday.net,DIRECT
+- DOMAIN-SUFFIX,tjupt.org,DIRECT
+- DOMAIN-SUFFIX,totheglory.im,DIRECT
+- DOMAIN-SUFFIX,smtp,DIRECT
+- DOMAIN-KEYWORD,announce,DIRECT
+- DOMAIN-KEYWORD,torrent,DIRECT
+- DOMAIN-KEYWORD,tracker,DIRECT
+- RULE-SET,applications,DIRECT
+- DOMAIN,clash.razord.top,DIRECT
+- DOMAIN,yacd.haishan.me,DIRECT
+- RULE-SET,private,DIRECT
+- "RULE-SET,reject,\U0001F6D1 广告拦截"
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,DIRECT
+- RULE-SET,tld-not-cn,PROXY
+- RULE-SET,gfw,PROXY
+- RULE-SET,greatfire,PROXY
+- RULE-SET,telegramcidr,PROXY
+- RULE-SET,lancidr,DIRECT
+- RULE-SET,cncidr,DIRECT
+- GEOIP,LAN,DIRECT
+- GEOIP,CN,DIRECT
+- RULE-SET,direct,DIRECT
+- "RULE-SET,proxy,\U0001F52F 代理模式"
+- PROCESS-NAME,aria2c,DIRECT
+- PROCESS-NAME,BitComet,DIRECT
+- PROCESS-NAME,fdm,DIRECT
+- PROCESS-NAME,NetTransport,DIRECT
+- PROCESS-NAME,qbittorrent,DIRECT
+- PROCESS-NAME,Thunder,DIRECT
+- PROCESS-NAME,transmission-daemon,DIRECT
+- PROCESS-NAME,transmission-qt,DIRECT
+- PROCESS-NAME,uTorrent,DIRECT
+- PROCESS-NAME,WebTorrent,DIRECT
+- PROCESS-NAME,Folx,DIRECT
+- PROCESS-NAME,Transmission,DIRECT
+- PROCESS-NAME,transmission,DIRECT
+- PROCESS-NAME,WebTorrent Helper,DIRECT
+- PROCESS-NAME,v2ray,DIRECT
+- PROCESS-NAME,ss-local,DIRECT
+- PROCESS-NAME,ssr-local,DIRECT
+- PROCESS-NAME,ss-redir,DIRECT
+- PROCESS-NAME,ssr-redir,DIRECT
+- PROCESS-NAME,ss-server,DIRECT
+- PROCESS-NAME,trojan-go,DIRECT
+- PROCESS-NAME,xray,DIRECT
+- PROCESS-NAME,hysteria,DIRECT
+- PROCESS-NAME,UUBooster,DIRECT
+- PROCESS-NAME,uugamebooster,DIRECT
+- "DST-PORT,80,\U0001F52F 代理模式"
+- "DST-PORT,443,\U0001F52F 代理模式"
+- "DST-PORT,22,\U0001F52F 代理模式"
+- MATCH,DIRECT
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: "./rule_provider/reject.yaml"
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: "./rule_provider/icloud.yaml"
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: "./rule_provider/apple.yaml"
+    interval: 86400
+  google:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: "./rule_provider/google.yaml"
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: "./rule_provider/proxy.yaml"
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: "./rule_provider/direct.yaml"
+    interval: 86400
+  private:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: "./rule_provider/private.yaml"
+    interval: 86400
+  gfw:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    path: "./rule_provider/gfw.yaml"
+    interval: 86400
+  greatfire:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt
+    path: "./rule_provider/greatfire.yaml"
+    interval: 86400
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt
+    path: "./rule_provider/tld-not-cn.yaml"
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: "./rule_provider/telegramcidr.yaml"
+    interval: 86400
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: "./rule_provider/cncidr.yaml"
+    interval: 86400
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: "./rule_provider/lancidr.yaml"
+    interval: 86400
+  applications:
+    type: http
+    behavior: classical
+    url: https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: "./rule_provider/applications.yaml"
+    interval: 86400
+redir-port: 7892
+tproxy-port: 7895
+external-ui: "/usr/share/openclash/ui"
+tun:
+  enable: true
+  stack: gvisor
+  auto-route: false
+  auto-detect-interface: false
+  dns-hijack:
+  - tcp://any:53
+profile:
+  store-selected: true
+  store-fake-ip: true
