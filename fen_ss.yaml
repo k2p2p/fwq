@@ -1,0 +1,2 @@
+proxies:
+  - {"type":"vmess","name":"ip1","ws-opts":{"path":"/kpUxnuYL/"},"server":"23.19.26.198","port":"48210","uuid":"2448fff3-bb63-4982-addb-ac9faff5ef41","alterId":"0","cipher":"auto","network":"ws"}
